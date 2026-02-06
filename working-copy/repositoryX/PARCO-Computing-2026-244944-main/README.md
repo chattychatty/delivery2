@@ -128,6 +128,36 @@ Executables will be placed in:
 bin\
 ```
 
+### Windows prerequisites (tested path for this repository)
+
+On Windows, the repository has been validated with:
+
+- Visual Studio 2022 Build Tools (C++ toolchain)
+- CMake
+- Microsoft MPI Runtime + SDK
+
+In a VS Developer PowerShell, set MS-MPI variables before configuring:
+
+```powershell
+$env:MSMPI_INC   = "C:\Program Files (x86)\Microsoft SDKs\MPI\Include"
+$env:MSMPI_LIB64 = "C:\Program Files (x86)\Microsoft SDKs\MPI\Lib\x64"
+$env:PATH        = "C:\Program Files\Microsoft MPI\Bin;$env:PATH"
+```
+
+Use the `NMake Makefiles` generator and pass OpenMP flags explicitly:
+
+```powershell
+cmake -S . -B build -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release -DOpenMP_C_FLAGS="/openmp:llvm" -DOpenMP_CXX_FLAGS="/openmp:llvm"
+cmake --build build
+```
+
+Quick smoke test:
+
+```powershell
+.\bin\custom_matrix.exe smoke.mtx 2000 2000 20000
+mpiexec -n 2 .\bin\spmv_mpi.exe smoke.mtx 1 static 64 2 2 --no-validate
+```
+
 ---
 
 ## Generate Matrices (Required Before Running SpMV)

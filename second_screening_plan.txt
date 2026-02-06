@@ -1,0 +1,66 @@
+UPDATED PASS 2 PLAN (v2) — Incorporating Feedback
+
+Goal
+- Remove Deliverable 1 safely while keeping the current working Deliverable 2 workflow unchanged.
+- Avoid risky path/binary renames during Pass 2.
+- After every build/run change: clean rebuild + smoke test gate.
+
+Step 0 — Snapshot
+- Commit/copy current state as: pass1_smoketest_ok
+
+Step 1 — Keep bin/matrices for now, but make it reproducible
+- Do NOT move matrix inputs yet (this can be done later as an optional cleanup).
+- Update .gitignore so:
+  - bin/ stays ignored (generated outputs)
+  - EXCEPT bin/matrices/** is tracked (so smoke.mtx is not lost)
+
+Gate test:
+- Re-run your existing smoke test exactly as before (same command/matrix path).
+
+Step 2 — CMake: build only D2 workflow targets (no deletion yet)
+- Edit CMakeLists.txt:
+  - Remove D1 targets from the build (and from any “all/install” lists if present).
+  - Keep D2 targets that your scripts/workflow use:
+    - spmv_mpi
+    - custom_matrix (keep this binary name; do NOT rename)
+    - strong_matrix (treat as required if scripts use it)
+    - mmio
+
+Gate test:
+- Delete build/ and rebuild from scratch
+- Run smoke test (same as you already used).
+
+Step 3 — Remove D1-only scripts (after build is decoupled)
+- Delete D1 scripts (examples): runreg*, runirr*, seqreg*, seqirr* (+ any PS1 variants).
+- Keep D2 scripts and PBS files (strong.sh, weak.sh, build.sh, strong.pbs, weak.pbs).
+- Ensure scripts still reference:
+  - bin/custom_matrix
+  - bin/strong_matrix
+  - the matrix paths they currently expect (no path rewrites here)
+
+Gate test:
+- Quick strong/weak run with small settings (short execution)
+- Smoke test still passes.
+
+Step 4 — Delete D1-code/
+Precondition:
+- CMake has zero references to D1 targets/sources.
+- D2 scripts run successfully without D1.
+
+Do:
+- Delete D1-code/ entirely.
+
+Gate test:
+- Clean rebuild from scratch
+- Smoke test run.
+
+Step 5 — Document Windows prerequisites (so tests are repeatable)
+Add a short README section describing:
+- CMake generator choice on Windows (e.g., NMake Makefiles)
+- MS-MPI installation + PATH / env requirements (so mpirun works)
+- OpenMP compile flag note (e.g., /openmp:llvm) if needed by spmv_mpi.cpp
+
+End state after Pass 2
+- Repo builds D2-only targets and runs the same smoke/strong/weak workflow.
+- D1 code and D1-only scripts removed.
+- Inputs in bin/matrices are preserved via .gitignore exception (optional later: move to matrices/).

@@ -1,7 +1,9 @@
 # Build and generated folders
 /build/
 /CMakeFiles/
-/bin/
+/bin/*
+!/bin/matrices/
+!/bin/matrices/**
 /results/
 
 # Compiled artifacts
