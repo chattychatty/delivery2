@@ -1,0 +1,68 @@
+MERGED CUT PLAN — PASS 1 (SAFE SCREENING / ZERO‑RISK)
+
+Goal
+- Do a first screening of obvious useless information inside repositoryX.
+- Do NOT change anything that could affect build/run behavior.
+- No code edits, no CMake edits, no script edits in this pass.
+
+1) Remove only generated / local environment clutter
+Delete (or ensure they are NOT committed):
+- build/
+- CMakeFiles/
+- bin/
+- results/
+- *.o, *.obj, *.a, *.so, *.dll, *.exe
+- IDE folders: .idea/, .vscode/
+- OS trash: .DS_Store, Thumbs.db
+
+Action
+- Add/extend a .gitignore to ignore all the above.
+
+Why safe
+- These are build outputs/editor configs. Removing them cannot break the project logic.
+
+2) Keep everything that could be part of the build or runtime
+DO NOT delete in Pass 1:
+- D1-code/   (even if it’s not needed long-term)
+- D2-code/
+- mmio/
+- CMakeLists.txt (unchanged)
+- script/ (unchanged)
+- strong.pbs / weak.pbs (if present)
+- matrices/ or any sample .mtx inputs
+- any README / docs (unchanged)
+
+Why
+- D1 may still be referenced by CMake/scripts. Keeping it avoids accidental breakage.
+
+3) Optional-safe: remove “dead artifacts” ONLY if clearly unrelated
+You may remove ONLY if you are sure they are not referenced by README/scripts:
+- old binaries copied around outside bin/
+- old results logs that are clearly obsolete
+- duplicate archives/zips
+- random screenshots
+
+Rule of thumb
+- If unsure → keep for now. This is a screening pass.
+
+4) Smoke test after Pass 1
+After cleaning, run the same build/run you already know works:
+- Configure + build with CMake as usual
+- Run a quick MPI test (e.g., mpirun -np 2) using the same matrix as before
+
+Pass criterion
+- Behavior/output matches what you had before the screening.
+
+WHAT WE POSTPONE (NOT NOW, TO AVOID RISK)
+
+Pass 2 (medium risk; only after Pass 1 is green)
+- Remove D1-code/ for real
+- Remove D1-only scripts (runreg*, seqreg*, etc.)
+- Update CMakeLists.txt to build only D2 targets
+- If D2 reuses any D1 helpers, migrate minimal code into D2 (no dependency on D1 folder)
+
+Pass 3 (higher risk; only after Pass 2 is green)
+- Simplify spmv_mpi.cpp (remove OpenMP paths / extra logging/metrics if not required)
+- Standardize program output and simplify strong/weak scripts accordingly
+
+END

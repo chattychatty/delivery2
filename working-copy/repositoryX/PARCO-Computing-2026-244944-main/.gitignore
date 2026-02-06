@@ -1,0 +1,21 @@
+# Build and generated folders
+/build/
+/CMakeFiles/
+/bin/
+/results/
+
+# Compiled artifacts
+*.o
+*.obj
+*.a
+*.so
+*.dll
+*.exe
+
+# IDE metadata
+/.idea/
+/.vscode/
+
+# OS junk
+.DS_Store
+Thumbs.db
