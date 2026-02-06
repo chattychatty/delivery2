@@ -1,0 +1,6 @@
+- The abstract should not include a summary of the entire paper; instead, it should briefly state the research objective, methodology, and key findings.  
+
+- The parallel algorithm should be clearly presented using LaTeX algorithm format.
+
+- The report lacks proper citations and references.
+
